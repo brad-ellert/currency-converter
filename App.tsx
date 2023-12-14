@@ -12,15 +12,15 @@ export default function App() {
     // Add more as needed
   };
 
-  const convertCurrency = (fromCurrency, toCurrency) => {
+  const convertCurrency = (fromCurrency: string, toCurrency: string) => {
     // Implement conversion logic here
     // For example, converting USD to EUR
     let result = 0;
     if (fromCurrency === 'USD' && toCurrency === 'EUR') {
-      result = amount * exchangeRates.USD_TO_EUR;
+      result = parseFloat(amount) * exchangeRates.USD_TO_EUR;
     }
     if (fromCurrency === 'EUR' && toCurrency === 'USD') {
-      result = amount * exchangeRates.EUR_TO_USD;
+      result = parseFloat(amount) * exchangeRates.EUR_TO_USD;
     }
     // Add other conversion logic as needed
 
