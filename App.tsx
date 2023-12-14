@@ -3,28 +3,30 @@ import { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
 
 export default function App() {
-  const [amount, setAmount] = useState('');
-  const [convertedAmount, setConvertedAmount] = useState('');
+  const [amount, setAmount] = useState("");
+  const [convertedAmount, setConvertedAmount] = useState("");
+
+  type ExchangeRates = {
+    [key: string]: number;
+  };
   // Hardcoded exchange rates for demonstration
-  const exchangeRates = {
-    USD_TO_EUR: 0.88,
-    EUR_TO_USD: 1.14,
-    // Add more as needed
+  // Base currency is USD
+  const exchangeRates: ExchangeRates = {
+    USD: 1,
+    EUR: 0.88,
+    JPY: 110,
+    // Add more currencies as needed
   };
 
   const convertCurrency = (fromCurrency: string, toCurrency: string) => {
-    // Implement conversion logic here
-    // For example, converting USD to EUR
-    let result = 0;
-    if (fromCurrency === 'USD' && toCurrency === 'EUR') {
-      result = parseFloat(amount) * exchangeRates.USD_TO_EUR;
+    const num = parseFloat(amount);
+    const fromRate = exchangeRates[fromCurrency];
+    const toRate = exchangeRates[toCurrency];
+    if (!isFinite(num) || fromRate === undefined || toRate === undefined) {
+      setConvertedAmount("");
+      return;
     }
-    if (fromCurrency === 'EUR' && toCurrency === 'USD') {
-      result = parseFloat(amount) * exchangeRates.EUR_TO_USD;
-    }
-    // Add other conversion logic as needed
-
-    setConvertedAmount(result.toFixed(2)); // Keeping two decimal places
+    setConvertedAmount(((num / fromRate) * toRate).toFixed(2));
   };
 
   return (
@@ -36,9 +38,23 @@ export default function App() {
         value={amount}
         onChangeText={setAmount}
       />
-      {/* Simple buttons for selecting currencies */}
-      <Button title="USD to EUR" onPress={() => convertCurrency('USD', 'EUR')} />
-      <Button title="EUR to USD" onPress={() => convertCurrency('EUR', 'USD')} />
+      {/* Create a button for every pair of currencies */}
+      {Object.keys(exchangeRates)
+        .flatMap((fromCurrency) =>
+          Object.keys(exchangeRates).map((toCurrency) => ({
+            from: fromCurrency,
+            to: toCurrency,
+            title: `${fromCurrency} to ${toCurrency}`,
+          }))
+        )
+        .filter((pair) => pair.from !== pair.to)
+        .map((pair) => (
+          <Button
+            key={pair.title}
+            title={pair.title}
+            onPress={() => convertCurrency(pair.from, pair.to)}
+          />
+        ))}
       {/* Display converted amount */}
       <Text style={styles.resultText}>Converted Amount: {convertedAmount}</Text>
       <StatusBar style="auto" />
@@ -49,14 +65,14 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
   input: {
     height: 40,
-    width: '80%',
-    borderColor: 'gray',
+    width: "80%",
+    borderColor: "gray",
     borderWidth: 1,
     marginBottom: 10,
     paddingHorizontal: 10,
