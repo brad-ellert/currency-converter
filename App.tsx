@@ -1,7 +1,12 @@
 import { StatusBar } from "expo-status-bar";
 import { useState, useEffect } from "react";
 import { StyleSheet, View } from "react-native";
-import { PaperProvider, Button, TextInput } from "react-native-paper";
+import {
+  PaperProvider,
+  Button,
+  TextInput,
+  HelperText,
+} from "react-native-paper";
 import { Picker } from "@react-native-picker/picker";
 
 function formatNumberAsCurrencyWithoutSymbol(amount: number, currency: string) {
@@ -18,6 +23,7 @@ export default function App() {
   const [convertedAmount, setConvertedAmount] = useState("");
   const [fromCurrency, setFromCurrency] = useState("USD");
   const [toCurrency, setToCurrency] = useState("USD");
+  const [error, setError] = useState(false);
 
   type ExchangeRates = {
     [key: string]: number;
@@ -43,10 +49,11 @@ export default function App() {
     const fromRate = exchangeRates[fromCurrency];
     const toRate = exchangeRates[toCurrency];
     if (!isFinite(num) || fromRate === undefined || toRate === undefined) {
-      setAmount("");
+      setError(true);
       setConvertedAmount("");
       return;
     }
+    setError(false);
     setAmount(formatNumberAsCurrencyWithoutSymbol(num, fromCurrency));
     setConvertedAmount(
       formatNumberAsCurrencyWithoutSymbol((num / fromRate) * toRate, toCurrency)
@@ -56,8 +63,8 @@ export default function App() {
   return (
     <PaperProvider>
       <View style={styles.container}>
-        {/* Wrapper for 'from' amount input and picker */}
-        <View style={styles.inputWrapper}>
+        {/* 'from' amount input and picker */}
+        <View style={styles.row}>
           <Picker
             selectedValue={fromCurrency}
             style={styles.picker}
@@ -68,24 +75,30 @@ export default function App() {
               <Picker.Item key={currency} label={currency} value={currency} />
             ))}
           </Picker>
-          <TextInput
-            keyboardType="numeric"
-            value={amount}
-            onChangeText={setAmount}
-          />
+          <View style={styles.textInputContainer}>
+            <TextInput
+              keyboardType="numeric"
+              value={amount}
+              error={error}
+              onChangeText={setAmount}
+            />
+          </View>
         </View>
+        <HelperText type="error" visible={error}>
+          Invalid
+        </HelperText>
 
         {/* Convert button */}
         <Button
-          style={styles.inputWrapper}
+          style={styles.button}
           mode="contained-tonal"
           onPress={() => convertCurrency()}
         >
           Convert
         </Button>
 
-        {/* Wrapper for 'to' amount display and picker */}
-        <View style={styles.inputWrapper}>
+        {/* 'to' amount display and picker */}
+        <View style={styles.row}>
           <Picker
             selectedValue={toCurrency}
             style={styles.picker}
@@ -96,7 +109,9 @@ export default function App() {
               <Picker.Item key={currency} label={currency} value={currency} />
             ))}
           </Picker>
-          <TextInput disabled={true} value={convertedAmount} />
+          <View style={styles.textInputContainer}>
+            <TextInput disabled={true} value={convertedAmount} />
+          </View>
         </View>
 
         <StatusBar style="auto" />
@@ -111,15 +126,21 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+    margin: 20,
   },
-  inputWrapper: {
+  row: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    margin: 10,
   },
   picker: {
     width: 120,
     height: 50,
+  },
+  textInputContainer: {
+    flex: 1, // Take up remaining space in the row
+  },
+  button: {
+    margin: 20,
   },
 });
