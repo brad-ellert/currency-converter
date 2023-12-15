@@ -1,11 +1,14 @@
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { PaperProvider, Button, Text, TextInput } from "react-native-paper";
+import { PaperProvider, Button, TextInput } from "react-native-paper";
+import { Picker } from "@react-native-picker/picker";
 
 export default function App() {
   const [amount, setAmount] = useState("");
   const [convertedAmount, setConvertedAmount] = useState("");
+  const [fromRate, setFromRate] = useState(1);
+  const [toRate, setToRate] = useState(1);
 
   type ExchangeRates = {
     [key: string]: number;
@@ -19,11 +22,9 @@ export default function App() {
     // Add more currencies as needed
   };
 
-  const convertCurrency = (fromCurrency: string, toCurrency: string) => {
+  const convertCurrency = () => {
     const num = parseFloat(amount);
-    const fromRate = exchangeRates[fromCurrency];
-    const toRate = exchangeRates[toCurrency];
-    if (!isFinite(num) || fromRate === undefined || toRate === undefined) {
+    if (!isFinite(num)) {
       setConvertedAmount("");
       return;
     }
@@ -33,36 +34,49 @@ export default function App() {
   return (
     <PaperProvider>
       <View style={styles.container}>
-        <TextInput
-          style={styles.spacing}
-          keyboardType="numeric"
-          value={amount}
-          onChangeText={setAmount}
-        />
-        {/* Create a button for every pair of currencies */}
-        {Object.keys(exchangeRates)
-          .flatMap((fromCurrency) =>
-            Object.keys(exchangeRates).map((toCurrency) => ({
-              from: fromCurrency,
-              to: toCurrency,
-              title: `${fromCurrency} to ${toCurrency}`,
-            }))
-          )
-          .filter((pair) => pair.from !== pair.to)
-          .map((pair) => (
-            <Button
-              style={styles.spacing}
-              key={pair.title}
-              mode="contained-tonal"
-              onPress={() => convertCurrency(pair.from, pair.to)}
-            >
-              {pair.title}
-            </Button>
-          ))}
-        {/* Display converted amount */}
-        <Text style={styles.spacing} variant="bodyLarge">
-          Converted Amount: {convertedAmount}
-        </Text>
+        {/* Wrapper for 'from' amount input and picker */}
+        <View style={styles.inputWrapper}>
+          <TextInput
+            keyboardType="numeric"
+            value={amount}
+            onChangeText={setAmount}
+          />
+          <Picker
+            selectedValue={fromRate}
+            style={styles.picker}
+            onValueChange={setFromRate}
+            mode="dropdown"
+          >
+            {Object.entries(exchangeRates).map(([currency, rate]) => (
+              <Picker.Item key={currency} label={currency} value={rate} />
+            ))}
+          </Picker>
+        </View>
+
+        {/* Convert button */}
+        <Button
+          style={styles.inputWrapper}
+          mode="contained-tonal"
+          onPress={() => convertCurrency()}
+        >
+          Convert
+        </Button>
+
+        {/* Wrapper for 'to' amount display and picker */}
+        <View style={styles.inputWrapper}>
+          <TextInput disabled={true} value={convertedAmount} />
+          <Picker
+            selectedValue={toRate}
+            style={styles.picker}
+            onValueChange={setToRate}
+            mode="dropdown"
+          >
+            {Object.entries(exchangeRates).map(([currency, rate]) => (
+              <Picker.Item key={currency} label={currency} value={rate} />
+            ))}
+          </Picker>
+        </View>
+
         <StatusBar style="auto" />
       </View>
     </PaperProvider>
@@ -76,7 +90,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  spacing: {
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     margin: 10,
+  },
+  picker: {
+    width: 110,
+    height: 50,
   },
 });
