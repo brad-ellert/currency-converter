@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import { PaperProvider, Button, TextInput } from "react-native-paper";
 import { Picker } from "@react-native-picker/picker";
@@ -7,24 +7,33 @@ import { Picker } from "@react-native-picker/picker";
 export default function App() {
   const [amount, setAmount] = useState("");
   const [convertedAmount, setConvertedAmount] = useState("");
-  const [fromRate, setFromRate] = useState(1);
-  const [toRate, setToRate] = useState(1);
+  const [fromCurrency, setFromCurrency] = useState("USD");
+  const [toCurrency, setToCurrency] = useState("USD");
 
   type ExchangeRates = {
     [key: string]: number;
   };
-  // Hardcoded exchange rates for demonstration
-  // Base currency is USD
-  const exchangeRates: ExchangeRates = {
-    USD: 1,
-    EUR: 0.88,
-    JPY: 110,
-    // Add more currencies as needed
+  const [exchangeRates, setExchangeRates] = useState<ExchangeRates>({ USD: 1 });
+
+  useEffect(() => {
+    fetchExchangeRates();
+  }, []);
+
+  const fetchExchangeRates = async () => {
+    try {
+      const response = await fetch("https://open.er-api.com/v6/latest/USD");
+      const data = await response.json();
+      setExchangeRates(data.rates);
+    } catch (error) {
+      console.error("Error fetching exchange rates:", error);
+    }
   };
 
   const convertCurrency = () => {
     const num = parseFloat(amount);
-    if (!isFinite(num)) {
+    const fromRate = exchangeRates[fromCurrency];
+    const toRate = exchangeRates[toCurrency];
+    if (!isFinite(num) || fromRate === undefined || toRate === undefined) {
       setConvertedAmount("");
       return;
     }
@@ -42,13 +51,13 @@ export default function App() {
             onChangeText={setAmount}
           />
           <Picker
-            selectedValue={fromRate}
+            selectedValue={fromCurrency}
             style={styles.picker}
-            onValueChange={setFromRate}
+            onValueChange={setFromCurrency}
             mode="dropdown"
           >
-            {Object.entries(exchangeRates).map(([currency, rate]) => (
-              <Picker.Item key={currency} label={currency} value={rate} />
+            {Object.keys(exchangeRates).map((currency) => (
+              <Picker.Item key={currency} label={currency} value={currency} />
             ))}
           </Picker>
         </View>
@@ -66,13 +75,13 @@ export default function App() {
         <View style={styles.inputWrapper}>
           <TextInput disabled={true} value={convertedAmount} />
           <Picker
-            selectedValue={toRate}
+            selectedValue={toCurrency}
             style={styles.picker}
-            onValueChange={setToRate}
+            onValueChange={setToCurrency}
             mode="dropdown"
           >
-            {Object.entries(exchangeRates).map(([currency, rate]) => (
-              <Picker.Item key={currency} label={currency} value={rate} />
+            {Object.keys(exchangeRates).map((currency) => (
+              <Picker.Item key={currency} label={currency} value={currency} />
             ))}
           </Picker>
         </View>
@@ -97,7 +106,7 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   picker: {
-    width: 110,
+    width: 120,
     height: 50,
   },
 });
