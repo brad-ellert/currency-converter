@@ -1,6 +1,7 @@
-import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import { StatusBar } from "expo-status-bar";
+import { useState } from "react";
+import { StyleSheet, View } from "react-native";
+import { PaperProvider, Button, Text, TextInput } from "react-native-paper";
 
 export default function App() {
   const [amount, setAmount] = useState("");
@@ -30,35 +31,41 @@ export default function App() {
   };
 
   return (
-    <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter Amount"
-        keyboardType="numeric"
-        value={amount}
-        onChangeText={setAmount}
-      />
-      {/* Create a button for every pair of currencies */}
-      {Object.keys(exchangeRates)
-        .flatMap((fromCurrency) =>
-          Object.keys(exchangeRates).map((toCurrency) => ({
-            from: fromCurrency,
-            to: toCurrency,
-            title: `${fromCurrency} to ${toCurrency}`,
-          }))
-        )
-        .filter((pair) => pair.from !== pair.to)
-        .map((pair) => (
-          <Button
-            key={pair.title}
-            title={pair.title}
-            onPress={() => convertCurrency(pair.from, pair.to)}
-          />
-        ))}
-      {/* Display converted amount */}
-      <Text style={styles.resultText}>Converted Amount: {convertedAmount}</Text>
-      <StatusBar style="auto" />
-    </View>
+    <PaperProvider>
+      <View style={styles.container}>
+        <TextInput
+          style={styles.spacing}
+          keyboardType="numeric"
+          value={amount}
+          onChangeText={setAmount}
+        />
+        {/* Create a button for every pair of currencies */}
+        {Object.keys(exchangeRates)
+          .flatMap((fromCurrency) =>
+            Object.keys(exchangeRates).map((toCurrency) => ({
+              from: fromCurrency,
+              to: toCurrency,
+              title: `${fromCurrency} to ${toCurrency}`,
+            }))
+          )
+          .filter((pair) => pair.from !== pair.to)
+          .map((pair) => (
+            <Button
+              style={styles.spacing}
+              key={pair.title}
+              mode="contained-tonal"
+              onPress={() => convertCurrency(pair.from, pair.to)}
+            >
+              {pair.title}
+            </Button>
+          ))}
+        {/* Display converted amount */}
+        <Text style={styles.spacing} variant="bodyLarge">
+          Converted Amount: {convertedAmount}
+        </Text>
+        <StatusBar style="auto" />
+      </View>
+    </PaperProvider>
   );
 }
 
@@ -69,16 +76,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  input: {
-    height: 40,
-    width: "80%",
-    borderColor: "gray",
-    borderWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-  },
-  resultText: {
-    marginTop: 20,
-    fontSize: 18,
+  spacing: {
+    margin: 10,
   },
 });
