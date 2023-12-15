@@ -4,6 +4,15 @@ import { StyleSheet, View } from "react-native";
 import { PaperProvider, Button, TextInput } from "react-native-paper";
 import { Picker } from "@react-native-picker/picker";
 
+function formatNumberAsCurrencyWithoutSymbol(amount: number, currency: string) {
+  return Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: currency,
+  })
+    .format(amount)
+    .replace(/[^\d.]/g, ""); // Removes anything that's not a digit or period
+}
+
 export default function App() {
   const [amount, setAmount] = useState("");
   const [convertedAmount, setConvertedAmount] = useState("");
@@ -34,10 +43,14 @@ export default function App() {
     const fromRate = exchangeRates[fromCurrency];
     const toRate = exchangeRates[toCurrency];
     if (!isFinite(num) || fromRate === undefined || toRate === undefined) {
+      setAmount("");
       setConvertedAmount("");
       return;
     }
-    setConvertedAmount(((num / fromRate) * toRate).toFixed(2));
+    setAmount(formatNumberAsCurrencyWithoutSymbol(num, fromCurrency));
+    setConvertedAmount(
+      formatNumberAsCurrencyWithoutSymbol((num / fromRate) * toRate, toCurrency)
+    );
   };
 
   return (
@@ -45,11 +58,6 @@ export default function App() {
       <View style={styles.container}>
         {/* Wrapper for 'from' amount input and picker */}
         <View style={styles.inputWrapper}>
-          <TextInput
-            keyboardType="numeric"
-            value={amount}
-            onChangeText={setAmount}
-          />
           <Picker
             selectedValue={fromCurrency}
             style={styles.picker}
@@ -60,6 +68,11 @@ export default function App() {
               <Picker.Item key={currency} label={currency} value={currency} />
             ))}
           </Picker>
+          <TextInput
+            keyboardType="numeric"
+            value={amount}
+            onChangeText={setAmount}
+          />
         </View>
 
         {/* Convert button */}
@@ -73,7 +86,6 @@ export default function App() {
 
         {/* Wrapper for 'to' amount display and picker */}
         <View style={styles.inputWrapper}>
-          <TextInput disabled={true} value={convertedAmount} />
           <Picker
             selectedValue={toCurrency}
             style={styles.picker}
@@ -84,6 +96,7 @@ export default function App() {
               <Picker.Item key={currency} label={currency} value={currency} />
             ))}
           </Picker>
+          <TextInput disabled={true} value={convertedAmount} />
         </View>
 
         <StatusBar style="auto" />
