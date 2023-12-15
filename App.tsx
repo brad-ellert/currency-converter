@@ -1,12 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { useState, useEffect } from "react";
 import { StyleSheet, View } from "react-native";
-import {
-  PaperProvider,
-  Button,
-  TextInput,
-  HelperText,
-} from "react-native-paper";
+import { PaperProvider, TextInput, HelperText } from "react-native-paper";
 import { Picker } from "@react-native-picker/picker";
 
 function formatNumberAsCurrencyWithoutSymbol(amount: number, currency: string) {
@@ -34,6 +29,10 @@ export default function App() {
     fetchExchangeRates();
   }, []);
 
+  useEffect(() => {
+    convertCurrency();
+  }, [amount, fromCurrency, toCurrency]);
+
   const fetchExchangeRates = async () => {
     try {
       const response = await fetch("https://open.er-api.com/v6/latest/USD");
@@ -45,6 +44,11 @@ export default function App() {
   };
 
   const convertCurrency = () => {
+    if (amount === "") {
+      setError(false);
+      setConvertedAmount("");
+      return;
+    }
     const num = parseFloat(amount);
     const fromRate = exchangeRates[fromCurrency];
     const toRate = exchangeRates[toCurrency];
@@ -54,7 +58,7 @@ export default function App() {
       return;
     }
     setError(false);
-    setAmount(formatNumberAsCurrencyWithoutSymbol(num, fromCurrency));
+    // setAmount(formatNumberAsCurrencyWithoutSymbol(num, fromCurrency));
     setConvertedAmount(
       formatNumberAsCurrencyWithoutSymbol((num / fromRate) * toRate, toCurrency)
     );
@@ -87,15 +91,6 @@ export default function App() {
         <HelperText type="error" visible={error}>
           Invalid
         </HelperText>
-
-        {/* Convert button */}
-        <Button
-          style={styles.button}
-          mode="contained-tonal"
-          onPress={() => convertCurrency()}
-        >
-          Convert
-        </Button>
 
         {/* 'to' amount display and picker */}
         <View style={styles.row}>
