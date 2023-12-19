@@ -8,8 +8,6 @@ describe("formatNumberAsCurrencyWithoutSymbol", () => {
   });
 
   it("formats JPY correctly", () => {
-    expect(formatNumberAsCurrencyWithoutSymbol(1234.567, "JPY")).toBe(
-      "1235"
-    );
+    expect(formatNumberAsCurrencyWithoutSymbol(1234.567, "JPY")).toBe("1235");
   });
 });
