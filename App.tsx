@@ -1,7 +1,12 @@
 import { StatusBar } from "expo-status-bar";
 import { useState, useEffect } from "react";
 import { StyleSheet, View } from "react-native";
-import { PaperProvider, TextInput, HelperText } from "react-native-paper";
+import {
+  DefaultTheme,
+  PaperProvider,
+  TextInput,
+  HelperText,
+} from "react-native-paper";
 import { Picker } from "@react-native-picker/picker";
 
 function formatNumberAsCurrencyWithoutSymbol(amount: number, currency: string) {
@@ -65,7 +70,7 @@ export default function App() {
   };
 
   return (
-    <PaperProvider>
+    <PaperProvider theme={DefaultTheme}>
       <View style={styles.container}>
         {/* 'from' amount input and picker */}
         <View style={styles.row}>
@@ -118,7 +123,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
     margin: 20,
