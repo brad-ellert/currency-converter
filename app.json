@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "CurrencyConverter",
-    "slug": "CurrencyConverter",
+    "slug": "currency-converter",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -15,16 +15,24 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.bradellert.currencyconverter"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.bradellert.currencyconverter"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "b7754f43-a8db-4de3-aa22-db46e6373137"
+      }
+    },
+    "owner": "brad-ellert"
   }
 }
