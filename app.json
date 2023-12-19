@@ -25,9 +25,6 @@
       },
       "package": "com.bradellert.currencyconverter"
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
     "extra": {
       "eas": {
         "projectId": "b7754f43-a8db-4de3-aa22-db46e6373137"
