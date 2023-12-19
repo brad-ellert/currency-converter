@@ -9,7 +9,7 @@ import {
 } from "react-native-paper";
 import { Picker } from "@react-native-picker/picker";
 
-function formatNumberAsCurrencyWithoutSymbol(amount: number, currency: string) {
+export function formatNumberAsCurrencyWithoutSymbol(amount: number, currency: string) {
   return Intl.NumberFormat("en-US", {
     style: "currency",
     currency: currency,
