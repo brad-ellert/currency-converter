@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import { useState, useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import {
@@ -18,7 +17,7 @@ export function formatNumberAsCurrencyWithoutSymbol(amount: number, currency: st
     .replace(/[^\d.]/g, ""); // Removes anything that's not a digit or period
 }
 
-export default function App() {
+export default function Page() {
   const [amount, setAmount] = useState("");
   const [convertedAmount, setConvertedAmount] = useState("");
   const [fromCurrency, setFromCurrency] = useState("USD");
@@ -144,8 +143,6 @@ export default function App() {
             <TextInput disabled={true} value={convertedAmount} />
           </View>
         </View>
-
-        <StatusBar style="auto" />
       </View>
     </PaperProvider>
   );
