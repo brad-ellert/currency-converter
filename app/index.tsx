@@ -30,37 +30,6 @@ export default function Page() {
   const [exchangeRates, setExchangeRates] = useState<ExchangeRates>({ USD: 1 });
 
   useEffect(() => {
-    const socket = new WebSocket('wss://ws-feed.exchange.coinbase.com');
-
-    socket.onopen = () => {
-      console.log('WebSocket Connected');
-      const subscribeMessage = {
-        type: "subscribe",
-        channels: [{ name: "ticker", product_ids: ["BTC-USD"] }]
-      };
-        socket.send(JSON.stringify(subscribeMessage));
-    };
-
-    socket.onmessage = (e) => {
-      const data = JSON.parse(e.data);
-      console.log(data);
-    };
-
-    socket.onerror = (e) => {
-      console.error("WebSocket error occurred");
-      console.log(e); // Log the entire event object for any available info
-    };    
-
-    socket.onclose = (e) => {
-      console.log('WebSocket Disconnected');
-    };
-
-    return () => {
-      socket.close();
-    };
-  }, []);
-
-  useEffect(() => {
     fetchExchangeRates();
   }, []);
 
